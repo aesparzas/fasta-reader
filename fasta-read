@@ -7,28 +7,31 @@ from Bio import SeqIO
 
 class FastaReader:
 
-    def __init__(self, input_file_path, output_file_path=None):
+    def __init__(self, string='', input_file_path=None, output_file_path=None):
+        self.string = string
         self.input_file_path = input_file_path
         self.output_file_path = output_file_path
 
     def read_file(self):
-        fasta_sequences = SeqIO.parse(open(self.input_file_path), 'fasta')
+        fasta_sequences = SeqIO.parse(open(self.input_file_path if self.input_file_path else self.string), 'fasta')
         if self.output_file_path:
             with open(self.output_file_path, 'w+') as out_file:
-                for fasta in fasta_sequences:
+                for index, fasta in enumerate(fasta_sequences):
                     name, sequence = fasta.id, str(fasta.seq)
-                    print(sequence)
-                    out_file.write(sequence)
+                    seq = {'sequence {}'.format(index): sequence}
+                    print(seq)
+                    out_file.write(str(seq))
             print('Result in', self.output_file_path)
 
 
 def main(argv):
     inputfile = None
     outputfile = None
-    help_text = 'fasta-read -i <inputfile> -o <outputfile>'
+    string = None
+    help_text = 'fasta-read -s <fasta_string> -i <inputfile> -o <outputfile>'
 
     try:
-        opts, args = getopt.getopt(argv, "hi:o:", ["input-file=", "output-file="])
+        opts, args = getopt.getopt(argv, "hi:o:s:", ["input-file=", "output-file=", "string="])
     except getopt.GetoptError:
         print(help_text)
         sys.exit(2)
@@ -36,11 +39,15 @@ def main(argv):
         if opt == '-h':
             print(help_text)
             sys.exit()
+        elif opt in ("-s", "--string"):
+            string = arg
         elif opt in ("-i", "--input-file"):
             inputfile = arg
         elif opt in ("-o", "--output-file"):
             outputfile = arg
 
+    if string and inputfile:
+        print('Warning: Input path and string given, the result is going to take into account the input file')
     reader = FastaReader(input_file_path=inputfile, output_file_path=outputfile)
     reader.read_file()
 
