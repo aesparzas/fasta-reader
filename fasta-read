@@ -48,7 +48,7 @@ def main(argv):
 
     if string and inputfile:
         print('Warning: Input path and string given, the result is going to take into account the input file')
-    reader = FastaReader(input_file_path=inputfile, output_file_path=outputfile)
+    reader = FastaReader(string=string, input_file_path=inputfile, output_file_path=outputfile)
     reader.read_file()
 
 
