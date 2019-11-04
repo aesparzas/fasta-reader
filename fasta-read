@@ -1,0 +1,49 @@
+#!/usr/bin/python
+import getopt
+import sys
+
+from Bio import SeqIO
+
+
+class FastaReader:
+
+    def __init__(self, input_file_path, output_file_path=None):
+        self.input_file_path = input_file_path
+        self.output_file_path = output_file_path
+
+    def read_file(self):
+        fasta_sequences = SeqIO.parse(open(self.input_file_path), 'fasta')
+        if self.output_file_path:
+            with open(self.output_file_path, 'w+') as out_file:
+                for fasta in fasta_sequences:
+                    name, sequence = fasta.id, str(fasta.seq)
+                    print(sequence)
+                    out_file.write(sequence)
+            print('Result in', self.output_file_path)
+
+
+def main(argv):
+    inputfile = None
+    outputfile = None
+    help_text = 'fasta-read -i <inputfile> -o <outputfile>'
+
+    try:
+        opts, args = getopt.getopt(argv, "hi:o:", ["input-file=", "output-file="])
+    except getopt.GetoptError:
+        print(help_text)
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print(help_text)
+            sys.exit()
+        elif opt in ("-i", "--input-file"):
+            inputfile = arg
+        elif opt in ("-o", "--output-file"):
+            outputfile = arg
+
+    reader = FastaReader(input_file_path=inputfile, output_file_path=outputfile)
+    reader.read_file()
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
