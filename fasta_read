@@ -44,13 +44,14 @@ class FastaReader(dict):
             v = next(it)
             if not k.startswith('>'):
                 raise Exception(FORMAT_ERROR_MESSAGE)
+            k = k[1:]
             self.__setitem__(k, v)
 
 
 def main(argv):
     input = None
     output_file = None
-    help_text = 'fasta-read -i <input_path_or_string> -o <output_file>'
+    help_text = 'fasta_read -i <input_path_or_string> -o <output_file>'
 
     try:
         opts, args = getopt.getopt(argv, "hi:o:s:", ["input-file=", "output-file=", "string="])
@@ -77,3 +78,6 @@ def main(argv):
 
 if __name__ == "__main__":
     main(sys.argv[1:])
+
+def __init__():
+    pass

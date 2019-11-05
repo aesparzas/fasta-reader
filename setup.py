@@ -4,9 +4,9 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name='fastaread',
+    name='fasta_read',
     version='1.0',
-    scripts=['fasta-read'],
+    scripts=['fasta_read'],
     author="Adolfo Esparza",
     author_email="esparzasordoadolfo@gmail.com",
     description="A small library for reading FASTA files",

@@ -1,0 +1,9 @@
+README.md
+fasta_read
+setup.py
+fasta_read.egg-info/PKG-INFO
+fasta_read.egg-info/SOURCES.txt
+fasta_read.egg-info/dependency_links.txt
+fasta_read.egg-info/top_level.txt
+tests/__init__.py
+tests/run.py

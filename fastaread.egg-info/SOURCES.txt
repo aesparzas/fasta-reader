@@ -1,0 +1,9 @@
+README.md
+fastaread
+setup.py
+fastaread.egg-info/PKG-INFO
+fastaread.egg-info/SOURCES.txt
+fastaread.egg-info/dependency_links.txt
+fastaread.egg-info/top_level.txt
+tests/__init__.py
+tests/run.py
