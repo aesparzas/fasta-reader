@@ -1,34 +1,56 @@
 #!/usr/bin/python
 import getopt
+import os
 import sys
 
-from Bio import SeqIO
 
+class FastaReader(dict):
 
-class FastaReader:
+    def __init__(self, input, output_file=None):
+        self.input = input
+        self.output_file = output_file
 
-    def __init__(self, string='', input_file_path=None, output_file_path=None):
-        self.string = string
-        self.input_file_path = input_file_path
-        self.output_file_path = output_file_path
+        # if the file doesn't exist, it will be considered a sequence input
+        if not os.path.exists(os.path.abspath(self.input)):
+            self.fasta_lines_to_dict(self.read_input_string())
+        else:
+            self.fasta_lines_to_dict(self.read_input_file())
 
-    def read_file(self):
-        fasta_sequences = SeqIO.parse(open(self.input_file_path if self.input_file_path else self.string), 'fasta')
-        if self.output_file_path:
-            with open(self.output_file_path, 'w+') as out_file:
-                for index, fasta in enumerate(fasta_sequences):
-                    name, sequence = fasta.id, str(fasta.seq)
-                    seq = {'sequence {}'.format(index): sequence}
-                    print(seq)
-                    out_file.write(str(seq))
-            print('Result in', self.output_file_path)
+        super().__init__()
+
+    def write_to_file(self):
+        if self.output_file:
+            with open(self.output_file, 'w+') as out_file:
+                for k, v in self.items():
+                    out_file.write(str([k, v]))
+            print('Result in', self.output_file)
+
+    def read_input_file(self):
+        with open(self.input, 'r') as in_file:
+            content = in_file.readlines()
+        return [line.strip() for line in content]
+
+    def read_input_string(self):
+        return self.input.split('\n')
+
+    def fasta_lines_to_dict(self, lines):
+        FORMAT_ERROR_MESSAGE = "The input is not a correct FASTA String"
+
+        if not len(lines) % 2 == 0:
+            raise Exception(FORMAT_ERROR_MESSAGE)
+        it = iter(lines)
+        for seq in it:
+            k = seq
+            v = next(it)
+            if not k.startswith('>'):
+                raise Exception(FORMAT_ERROR_MESSAGE)
+            self.__setitem__(k, v)
 
 
 def main(argv):
-    inputfile = None
-    outputfile = None
-    string = None
-    help_text = 'fasta-read -s <fasta_string> -i <inputfile> -o <outputfile>'
+    input = None
+    output_file = None
+    help_text = 'fasta-read -i <input_path_or_string> -o <output_file>'
 
     try:
         opts, args = getopt.getopt(argv, "hi:o:s:", ["input-file=", "output-file=", "string="])
@@ -36,21 +58,22 @@ def main(argv):
         print(help_text)
         sys.exit(2)
     for opt, arg in opts:
-        if opt == '-h':
+        if opt in ("-i", "--input"):
+            input = arg
+        elif opt in ("-o", "--output"):
+            output_file = arg
+        else:
             print(help_text)
             sys.exit()
-        elif opt in ("-s", "--string"):
-            string = arg
-        elif opt in ("-i", "--input-file"):
-            inputfile = arg
-        elif opt in ("-o", "--output-file"):
-            outputfile = arg
+    if not input:
+        print(help_text)
+        sys.exit()
 
-    if string and inputfile:
-        print('Warning: Input path and string given, the result is going to take into account the input file')
-    reader = FastaReader(string=string, input_file_path=inputfile, output_file_path=outputfile)
-    reader.read_file()
-
+    reader = FastaReader(input, output_file=output_file)
+    for k, v in reader.items():
+        print(k, v)
+    if output_file:
+        reader.write_to_file()
 
 if __name__ == "__main__":
     main(sys.argv[1:])
